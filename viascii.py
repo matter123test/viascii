@@ -19,14 +19,26 @@ parser.add_argument(
 parser.add_argument(
     "-rt", "--rtemp", action="store_true", help="Removes created audio file"
 )
+parser.add_argument(
+    "-g",
+    "--grayscale",
+    type=str,
+    help="Custom grayscale string",
+    default="""@MBHENR#KWXDFPQASUZbdehx*8Gm&04LOVYkpq5Tagns69owz$CIu23Jcfry%1v7l+it[] {}?j|()=~!-/<>\"^_';,:`. """,
+)
 
-parser.add_argument("--dimensions", type=lambda s: tuple(map(int, s.strip("()").split(","))),
-                    help="Dimensions in the format (x, y)", default=(100, 50))
+parser.add_argument(
+    "--dimensions",
+    type=lambda s: tuple(map(int, s.strip("()").split(","))),
+    help="Dimensions in the format (x, y)",
+    default=(100, 50),
+)
 
 # Parse arguments
 args = parser.parse_args()
 
 r_width, r_height = args.dimensions
+
 
 def extract_audio(video_path: str) -> str:
     audio_output_path = video_path.split(".")[0] + "_split.wav"
@@ -37,7 +49,7 @@ def extract_audio(video_path: str) -> str:
     return audio_output_path
 
 
-grayscale = """"@MBHENR#KWXDFPQASUZbdehx*8Gm&04LOVYkpq5Tagns69owz$CIu23Jcfry%1v7l+it[] {}?j|()=~!-/<>\"^_';,:`. """
+grayscale = args.grayscale
 
 grayscale_normal = grayscale
 grayscale_inverted = grayscale[::-1]
@@ -122,7 +134,7 @@ def run(video_path: str, audio_path: str | None) -> None:
                 os.remove(audio_path)
             except Exception as e:
                 print(e)
-        
+
     cap.release()
 
 
