@@ -19,7 +19,7 @@ pip install -r requirements.txt
 
 # Usage
 ```
-usage: viascii.py [-h] [-a] [-i] [-rt] [--dimensions DIMENSIONS] video
+usage: viascii.py [-h] [-a] [-i] [-rt] [-g GRAYSCALE] [--dimensions DIMENSIONS] video
 
 Realtime frame to ascii renderer
 
@@ -31,6 +31,8 @@ options:
   -a, --audio           Enable audio
   -i, --inverted        Reverse the ascii grayscale string
   -rt, --rtemp          Removes created audio file
+  -g GRAYSCALE, --grayscale GRAYSCALE
+                        Custom grayscale string
   --dimensions DIMENSIONS
                         Dimensions in the format (x, y)
 ```
