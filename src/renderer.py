@@ -72,7 +72,7 @@ class Renderer:
 
                 ret, rgb_frame = cap.read()
 
-                if count >= self.args.endin:
+                if self.args.endin is not None and count >= self.args.endin:
                     break
 
                 if ret:
