@@ -1,6 +1,6 @@
 # Introduction
 
-viascii is a realtime video frame to ascii renderer
+viascii is an video to ascii converter
 
 __SAMPLE VIDEO:__
 
@@ -19,9 +19,9 @@ pip install -r requirements.txt
 
 # Usage
 ```
-usage: viascii.py [-h] [-a] [-i] [-rt] [-g GRAYSCALE] [--dimensions DIMENSIONS] video
+usage: main.py [-h] [-a] [-i] [-rt] [-g GRAYSCALE] [-d DIMENSIONS] [-s SAVEPATH] video
 
-Realtime frame to ascii renderer
+Video to ascii renderer
 
 positional arguments:
   video                 The path of the video
@@ -33,14 +33,16 @@ options:
   -rt, --rtemp          Removes created audio file
   -g GRAYSCALE, --grayscale GRAYSCALE
                         Custom grayscale string
-  --dimensions DIMENSIONS
+  -d DIMENSIONS, --dimensions DIMENSIONS
                         Dimensions in the format (x, y)
+  -s SAVEPATH, --savepath SAVEPATH
+                        Saves the ascii frames into a text file
 ```
 
 Example command:
 
-```python viascii.py bad_apple.mp4 --audio -rt```
+```python run.py bad_apple.mp4 --audio -rt```
 
 Or with the custom dimensions (the default value is (100, 50)):
 
-```python viascii.py bad_apple.mp4 --audio -rt --dimensions="(120, 70)"```
+```python run.py bad_apple.mp4 --audio -rt --dimensions="(120,70)"```
