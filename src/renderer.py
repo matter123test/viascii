@@ -7,6 +7,7 @@ import sys
 import numpy as np
 from tqdm import tqdm
 import ffmpeg
+import linecache
 
 
 class Renderer:
@@ -60,7 +61,7 @@ class Renderer:
         if is_audio:
             audio_player = AudioPlayer(video_path, self.args)
             audio_player.play_audio()
-            
+
         os.system("clear")
 
         try:
@@ -109,10 +110,10 @@ class Renderer:
 
         cap = cv2.VideoCapture(video_path)
 
-        total_frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+        total_frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         frame_count = 0
 
-        target_fps = cap.get(cv2.CAP_PROP_FPS)
+        target_fps = int(cap.get(cv2.CAP_PROP_FPS))
 
         print(f"Saving ascii frames to {output_path}")
 
@@ -143,6 +144,49 @@ class Renderer:
                 os.system("clear")
 
         print(f"Saving frames completed.")
+
+    def get_frame_from_file(self, frames_path, line_start, line_end):
+        ascii_frame = ""
+        for i in range(line_start, line_end):
+            ascii_frame += linecache.getline(frames_path, i + 2)
+
+        return ascii_frame
+
+    def read_frames(self, frames_path):
+        os.system("clear")
+
+        frame_format = None
+        with open(frames_path, "r") as f:
+            frame_format = f.readline()
+
+        width, height, total_frame_count, target_fps = tuple(
+            map(int, frame_format.strip("()\n").split(","))
+        )
+
+        frame_delay = 1 / target_fps  # Time per frame in seconds (1/60)
+
+        count = 0
+
+        while count < total_frame_count:
+            start_time = time.time()
+
+            # Calculating line_start and line_end for each frame
+            line_start = count * height
+            line_end = line_start + height
+
+            # print(f"{line_start}, {line_end}")
+            ascii_frame = self.get_frame_from_file(frames_path, line_start, line_end)
+
+            self.print_ascii_frame(ascii_frame)
+
+            # Calculate the elapsed time for this frame
+            elapsed_time = time.time() - start_time
+
+            # If processing was faster than the frame delay, wait for the remaining time
+            if elapsed_time < frame_delay:
+                time.sleep(frame_delay - elapsed_time)
+
+            count += 1
 
 
 class AudioPlayer:

@@ -19,30 +19,34 @@ pip install -r requirements.txt
 
 # Usage
 ```
-usage: main.py [-h] [-a] [-i] [-rt] [-g GRAYSCALE] [-d DIMENSIONS] [-s SAVEPATH] video
+usage: main.py [-h] [-v VIDEO] [-a] [-i] [-rt] [-g GRAYSCALE] [-d DIMENSIONS] [-s SAVEPATH] [-r READ]
 
 Video to ascii renderer
 
-positional arguments:
-  video                 The path of the video
-
 options:
   -h, --help            show this help message and exit
+  -v VIDEO, --video VIDEO
+                        The path of the video
   -a, --audio           Enable audio
   -i, --inverted        Reverse the ascii grayscale string
   -rt, --rtemp          Removes created audio file
   -g GRAYSCALE, --grayscale GRAYSCALE
                         Custom grayscale string
   -d DIMENSIONS, --dimensions DIMENSIONS
-                        Dimensions in the format (x, y)
+                        Dimensions in the format (x,y)
   -s SAVEPATH, --savepath SAVEPATH
                         Saves the ascii frames into a text file
+  -r READ, --read READ  Reads the ascii frames from a text file
 ```
 
 Example command:
 
-```python viascii.py bad_apple.mp4 --audio -rt```
+```python viascii.py -v bad_apple.mp4 --audio -rt```
 
-Or with the custom dimensions (the default value is (100, 50)):
+With the custom dimensions (the default value is (100, 50)):
 
 ```python viascii.py bad_apple.mp4 --audio -rt --dimensions="(120,70)"```
+
+Reading ascii frames from a file: 
+
+```python viascii.py -r frames.txt``` 
