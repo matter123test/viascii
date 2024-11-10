@@ -132,7 +132,11 @@ class Renderer:
         cap = cv2.VideoCapture(video_path)
 
         total_frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        frame_count = 0
+
+        if self.args.endin is not None:
+            total_frame_count = self.args.endin - self.args.startin
+
+        count = self.args.startin
 
         target_fps = int(cap.get(cv2.CAP_PROP_FPS))
 
@@ -147,6 +151,9 @@ class Renderer:
                 while cap.isOpened():
                     ret, rgb_frame = cap.read()
 
+                    if self.args.endin is not None and count >= self.args.endin:
+                        break
+
                     if ret:
                         frame = cv2.resize(
                             rgb_frame,
@@ -157,7 +164,7 @@ class Renderer:
                         ascii_frame = self.frame_to_ascii(frame)
 
                         self.save_frame(ascii_frame, output_path)
-                        frame_count += 1
+                        count += 1
                         pbar.update(1)
                     else:
                         break
@@ -191,6 +198,9 @@ class Renderer:
 
         try:
             while count < total_frame_count:
+                if self.args.endin is not None and count >= self.args.endin:
+                    break
+
                 start_time = time.time()
 
                 # Calculating line_start and line_end for each frame

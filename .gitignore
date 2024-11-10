@@ -3,3 +3,4 @@
 __pycache__
 *.wav
 bad_apple_frames.txt
+frames.txt
