@@ -41,8 +41,8 @@ options:
 
 Example command:
 
-```python run.py bad_apple.mp4 --audio -rt```
+```python viascii.py bad_apple.mp4 --audio -rt```
 
 Or with the custom dimensions (the default value is (100, 50)):
 
-```python run.py bad_apple.mp4 --audio -rt --dimensions="(120,70)"```
+```python viascii.py bad_apple.mp4 --audio -rt --dimensions="(120,70)"```
