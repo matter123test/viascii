@@ -7,4 +7,7 @@ args = ["python", "src/main.py"]
 # Add any additional arguments to `args` if needed, for example:
 args.extend(sys.argv[1:])
 
-subprocess.run(args=args)
+try:
+    subprocess.run(args=args)
+except KeyboardInterrupt:
+    pass
