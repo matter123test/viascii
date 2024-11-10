@@ -5,11 +5,18 @@ import os
 
 
 # Initialize the parser
-parser = argparse.ArgumentParser(description="Video to ascii renderer")
+parser = argparse.ArgumentParser(description="Video to ascii converter")
 
 # Add arguments
-parser.add_argument("-v", "--video", type=str, help="The path of the video", default=None)
+parser.add_argument(
+    "-v", "--video", type=str, help="The path of the video", default=None
+)
+
 parser.add_argument("-a", "--audio", action="store_true", help="Enable audio")
+parser.add_argument(
+    "-av", "--audiovolume", type=float, help="Change the audio volume", default=50
+)
+
 parser.add_argument(
     "-i", "--inverted", action="store_false", help="Reverse the ascii grayscale string"
 )
@@ -48,8 +55,19 @@ parser.add_argument(
     default=None,
 )
 
+parser.add_argument(
+    "-st", "--startin", type=int, help="Starts from a specific frame", default=0
+)
 
-# Parse arguments
+parser.add_argument(
+    "-ed",
+    "--endin",
+    type=int,
+    help="Ends the process on a specific frame",
+    default=None,
+)
+# TODO: IMPLEMENT ENDIN for audio files
+
 args = parser.parse_args()
 
 
@@ -70,9 +88,13 @@ def main():
     viascii = Renderer(args)
 
     video_path = args.video
-    
+
     if args.read is not None:
         viascii.read_frames(args.read)
+        return
+
+    if args.endin is not None and args.endin < args.startin:
+        print("Ending frame number is lower than the starting frame number")
         return
 
     if args.video is not None:

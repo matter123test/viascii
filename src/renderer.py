@@ -1,13 +1,13 @@
 import cv2
 import os
-import pygame
 import argparse
 import time
 import sys
 import numpy as np
-from tqdm import tqdm
-import ffmpeg
 import linecache
+
+from audio_player import AudioPlayer
+from tqdm import tqdm
 
 
 class Renderer:
@@ -30,7 +30,6 @@ class Renderer:
         # Normalize the grayscale value to the range of characters
         return self.grayscale[int(gray_value / 255 * (num_chars - 1))]
 
-    # Assuming pixel_to_ascii is defined to convert a pixel to an ASCII character
     def frame_to_ascii(self, frame) -> str:
         # Convert resized frame to grayscale
         gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -38,7 +37,6 @@ class Renderer:
         # Create a string of ASCII characters
         ascii_chars = np.vectorize(self.pixel_to_ascii)(gray_frame)
 
-        # Join ASCII characters into lines
         ascii_frame = "\n".join("".join(row) for row in ascii_chars)
 
         return ascii_frame
@@ -53,16 +51,20 @@ class Renderer:
 
         cap = cv2.VideoCapture(video_path)
 
+        frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
         target_fps = cap.get(cv2.CAP_PROP_FPS)
         frame_delay = 1 / target_fps  # Time per frame in seconds (1/60)
 
         audio_player = None
 
+        audio_time_skip = self.args.startin / target_fps
+
         if is_audio:
             audio_player = AudioPlayer(video_path, self.args)
-            audio_player.play_audio()
 
         os.system("clear")
+
+        count = 0
 
         try:
             while cap.isOpened():
@@ -70,22 +72,41 @@ class Renderer:
 
                 ret, rgb_frame = cap.read()
 
+                if count >= self.args.endin:
+                    break
+
                 if ret:
-                    frame = cv2.resize(
-                        rgb_frame,
-                        dsize=(self.r_width, self.r_height),
-                        interpolation=cv2.INTER_LINEAR,
-                    )
+                    if count >= self.args.startin:
+                        # Play audio after searching the frame
+                        if (
+                            audio_player is not None
+                            and not audio_player.is_audio_played()
+                        ):
+                            audio_player.play_audio()
+                            audio_player.set_pos(audio_time_skip)
 
-                    ascii_frame = self.frame_to_ascii(frame)
-                    self.print_ascii_frame(ascii_frame)
+                        frame = cv2.resize(
+                            rgb_frame,
+                            dsize=(self.r_width, self.r_height),
+                            interpolation=cv2.INTER_LINEAR,
+                        )
 
-                    # Calculate the elapsed time for this frame
-                    elapsed_time = time.time() - start_time
+                        ascii_frame = self.frame_to_ascii(frame)
+                        self.print_ascii_frame(ascii_frame)
 
-                    # If processing was faster than the frame delay, wait for the remaining time
-                    if elapsed_time < frame_delay:
-                        time.sleep(frame_delay - elapsed_time)
+                        # Calculate the elapsed time for this frame
+                        elapsed_time = time.time() - start_time
+
+                        # If processing was faster than the frame delay, wait for the remaining time
+                        if elapsed_time < frame_delay:
+                            time.sleep(frame_delay - elapsed_time)
+                    else:
+                        sys.stdout.write(
+                            "\033[H" + f"Searching for frame n°{self.args.startin}\n"
+                        )
+                        sys.stdout.flush()
+
+                    count += 1
                 else:
                     break
 
@@ -165,54 +186,31 @@ class Renderer:
 
         frame_delay = 1 / target_fps  # Time per frame in seconds (1/60)
 
-        count = 0
+        # Default value is 0
+        count = self.args.startin
 
-        while count < total_frame_count:
-            start_time = time.time()
+        try:
+            while count < total_frame_count:
+                start_time = time.time()
 
-            # Calculating line_start and line_end for each frame
-            line_start = count * height
-            line_end = line_start + height
+                # Calculating line_start and line_end for each frame
+                line_start = count * height
+                line_end = line_start + height
 
-            # print(f"{line_start}, {line_end}")
-            ascii_frame = self.get_frame_from_file(frames_path, line_start, line_end)
+                # print(f"{line_start}, {line_end}")
+                ascii_frame = self.get_frame_from_file(
+                    frames_path, line_start, line_end
+                )
 
-            self.print_ascii_frame(ascii_frame)
+                self.print_ascii_frame(ascii_frame)
 
-            # Calculate the elapsed time for this frame
-            elapsed_time = time.time() - start_time
+                # Calculate the elapsed time for this frame
+                elapsed_time = time.time() - start_time
 
-            # If processing was faster than the frame delay, wait for the remaining time
-            if elapsed_time < frame_delay:
-                time.sleep(frame_delay - elapsed_time)
+                # If processing was faster than the frame delay, wait for the remaining time
+                if elapsed_time < frame_delay:
+                    time.sleep(frame_delay - elapsed_time)
 
-            count += 1
-
-
-class AudioPlayer:
-    def __init__(self, video_path, args):
-        self.audio_path = self.extract_audio(video_path)
-        self.args = args
-
-    def extract_audio(self, video_path: str) -> str:
-        audio_output_path = video_path.split(".")[0] + "_split.wav"
-
-        # Extract audio from video
-        ffmpeg.input(video_path).output(audio_output_path).run()
-
-        return audio_output_path
-
-    def play_audio(self):
-        pygame.init()
-        pygame.mixer.music.load(self.audio_path)
-        pygame.mixer.music.play()
-
-    def stop_audio(self):
-        pygame.mixer.music.stop()
-
-        # Remove created audio file
-        if self.args.rtemp:
-            try:
-                os.remove(self.audio_path)
-            except Exception as e:
-                print(e)
+                count += 1
+        except KeyboardInterrupt:
+            pass

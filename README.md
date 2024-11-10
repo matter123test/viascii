@@ -21,7 +21,7 @@ pip install -r requirements.txt
 ```
 usage: main.py [-h] [-v VIDEO] [-a] [-i] [-rt] [-g GRAYSCALE] [-d DIMENSIONS] [-s SAVEPATH] [-r READ]
 
-Video to ascii renderer
+Video to ascii converter
 
 options:
   -h, --help            show this help message and exit
