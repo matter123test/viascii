@@ -1,6 +1,6 @@
 # Introduction
 
-viascii is an video to ascii converter
+viascii is an video to ascii converter (the code is kinda shitty though)
 
 __SAMPLE VIDEO:__
 
