@@ -10,7 +10,7 @@ from audio_player import AudioPlayer
 from tqdm import tqdm
 
 
-class Renderer:
+class VideoRenderer:
     def __init__(self, args: argparse.Namespace):
         self.args = args
         self.r_width, self.r_height = args.dimensions
@@ -51,7 +51,7 @@ class Renderer:
 
         cap = cv2.VideoCapture(video_path)
 
-        frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+        cap.get(cv2.CAP_PROP_FRAME_COUNT)
         target_fps = cap.get(cv2.CAP_PROP_FPS)
         frame_delay = 1 / target_fps  # Time per frame in seconds (1/60)
 
@@ -79,8 +79,8 @@ class Renderer:
                     if count >= self.args.startin:
                         # Play audio after searching the frame
                         if (
-                            audio_player is not None
-                            and not audio_player.is_audio_played()
+                                audio_player is not None
+                                and not audio_player.is_audio_played()
                         ):
                             audio_player.play_audio()
                             audio_player.set_pos(audio_time_skip)
@@ -183,7 +183,6 @@ class Renderer:
     def read_frames(self, frames_path):
         os.system("clear")
 
-        frame_format = None
         with open(frames_path, "r") as f:
             frame_format = f.readline()
 

@@ -1,8 +1,9 @@
-from renderer import Renderer
 import argparse
 import time
 import os
 
+from video_renderer import VideoRenderer
+from image_renderer import ImageRenderer
 
 # Initialize the parser
 parser = argparse.ArgumentParser(description="Video to ascii converter")
@@ -66,7 +67,17 @@ parser.add_argument(
     help="Ends the process on a specific frame",
     default=None,
 )
-# TODO: IMPLEMENT ENDIN for audio files
+
+# Image args
+parser.add_argument(
+    "-im", "--image", type=str, help="The path of the image", default=None
+)
+
+parser.add_argument("-ir", "--isrgb", action="store_true", help="This only applies to images")
+
+parser.add_argument("-an", "--angle", type=int, help="Changes the image angle", default=90)
+
+parser.add_argument("-c", "--contrast", type=int, help="Set the contrast of the foreground text", default=0)
 
 args = parser.parse_args()
 
@@ -79,25 +90,26 @@ def calculate_time(func):
 
         end = time.time()
 
-        print(f"{func.__name__} took: {end-start:.1}s")
+        print(f"{func.__name__} took: {end - start:.1}s")
 
     return wrapper
 
 
 def main():
-    viascii = Renderer(args)
-
-    video_path = args.video
+    # Read from file
+    viascii = VideoRenderer(args)
+    if args.endin is not None and args.endin < args.startin:
+        print("Ending frame number is lower than the starting frame number")
+        return
 
     if args.read is not None:
         viascii.read_frames(args.read)
         return
 
-    if args.endin is not None and args.endin < args.startin:
-        print("Ending frame number is lower than the starting frame number")
-        return
-
+    # Render video
     if args.video is not None:
+        video_path = args.video
+
         if not os.path.exists(video_path):
             print(f"'{video_path}' does not exist.")
             return
@@ -110,6 +122,13 @@ def main():
             viascii.print_ascii_frames(video_path, is_audio=True)
         else:
             viascii.print_ascii_frames(video_path)
+
+    # Render image
+    elif args.image is not None:
+
+        iascii = ImageRenderer(args)
+
+        iascii.print_image(args.image, args.isrgb, args.angle)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
-/.venv/
+/venv/
 /.vscode/
+/.idea/
 __pycache__
 *.wav
-bad_apple_frames.txt
-frames.txt
+*.txt
+*.png
