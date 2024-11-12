@@ -1,3 +1,5 @@
+import os
+
 from PIL import Image
 
 
@@ -63,11 +65,26 @@ class ImageRenderer:
         return ascii_image
 
     def print_image(self, image_path, is_rgb: bool, angle: int):
+        os.system("clear")
+
         if is_rgb:
             rgb_image = Image.open(image_path).convert("RGB")
             rgb_image = rgb_image.rotate(angle)
-            print(self.image_to_ascii_rgb(rgb_image))
+            rgb_ascii_image = self.image_to_ascii_rgb(rgb_image)
+
+            ascii_image = rgb_ascii_image
         else:
             bw_image = Image.open(image_path).convert("L")
             bw_image = bw_image.rotate(angle)
-            print(self.image_to_ascii_bw(bw_image))
+            bw_ascii_image = self.image_to_ascii_bw(bw_image)
+
+            ascii_image = bw_ascii_image
+
+        print(ascii_image)
+
+        if self.args.savepath is not None:
+            self.save_image(ascii_image)
+
+    def save_image(self, ascii_image):
+        with open(self.args.savepath, "w") as f:
+            f.write(ascii_image)

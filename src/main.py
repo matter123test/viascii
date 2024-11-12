@@ -79,7 +79,7 @@ parser.add_argument("-an", "--angle", type=int, help="Changes the image angle", 
 
 parser.add_argument("-c", "--contrast", type=int, help="Set the contrast of the foreground text", default=0)
 
-args = parser.parse_args()
+program_args = parser.parse_args()
 
 
 def calculate_time(func):
@@ -97,38 +97,38 @@ def calculate_time(func):
 
 def main():
     # Read from file
-    viascii = VideoRenderer(args)
-    if args.endin is not None and args.endin < args.startin:
+    viascii = VideoRenderer(program_args)
+    if program_args.endin is not None and program_args.endin < program_args.startin:
         print("Ending frame number is lower than the starting frame number")
         return
 
-    if args.read is not None:
-        viascii.read_frames(args.read)
+    if program_args.read is not None:
+        viascii.read_frames(program_args.read)
         return
 
     # Render video
-    if args.video is not None:
-        video_path = args.video
+    if program_args.video is not None:
+        video_path = program_args.video
 
         if not os.path.exists(video_path):
             print(f"'{video_path}' does not exist.")
             return
 
-        if args.savepath is not None:
-            viascii.save_frames(video_path, args.savepath)
+        if program_args.savepath is not None:
+            viascii.save_frames(video_path, program_args.savepath)
             return
 
-        if args.audio:
+        if program_args.audio:
             viascii.print_ascii_frames(video_path, is_audio=True)
         else:
             viascii.print_ascii_frames(video_path)
 
     # Render image
-    elif args.image is not None:
+    elif program_args.image is not None:
 
-        iascii = ImageRenderer(args)
+        iascii = ImageRenderer(program_args)
 
-        iascii.print_image(args.image, args.isrgb, args.angle)
+        iascii.print_image(program_args.image, program_args.isrgb, program_args.angle)
 
 
 if __name__ == "__main__":
