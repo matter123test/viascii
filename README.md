@@ -69,6 +69,4 @@ Reading ascii frames from a file:
 
 Converting image to ascii:
 
-<img src=water_melon_cat.png width="100"></img>
-
 ```python viascii.py -im water_melon_cat.png --dimensions=50,100 --isrgb --contrast 10```
