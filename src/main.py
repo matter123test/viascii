@@ -8,7 +8,7 @@ from image_renderer import ImageRenderer
 # Initialize the parser
 parser = argparse.ArgumentParser(description="Video to ascii converter")
 
-# Add arguments
+# Video and Image arguments (some of them)
 parser.add_argument(
     "-v", "--video", type=str, help="The path of the video", default=None
 )
@@ -68,7 +68,7 @@ parser.add_argument(
     default=None,
 )
 
-# Image args
+# Image only args
 parser.add_argument(
     "-im", "--image", type=str, help="The path of the image", default=None
 )

@@ -30,6 +30,12 @@ class VideoRenderer:
         # Normalize the grayscale value to the range of characters
         return self.grayscale[int(gray_value / 255 * (num_chars - 1))]
 
+    def rgb_to_ansi_bg(self, r, g, b):
+        return f"\033[48;2;{r};{g};{b}m"  # ANSI background color
+
+    def rgb_to_ansi_fg(self, r, g, b):
+        return f"\033[38;2;{r};{g};{b}m"  # ANSI foreground color
+
     def frame_to_ascii(self, frame) -> str:
         # Convert resized frame to grayscale
         gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -40,6 +46,32 @@ class VideoRenderer:
         ascii_frame = "\n".join("".join(row) for row in ascii_chars)
 
         return ascii_frame
+
+    # TODO: Make an async function that handles printing and generating frames instead of running on the same thread
+    def frame_to_ascii_rgb(self, frame) -> str:
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        brightness = 0.299 * rgb_frame[:, :, 0] + 0.587 * rgb_frame[:, :, 1] + 0.114 * rgb_frame[:, :, 2]
+
+        # Apply contrast adjustments to RGB channels
+        contrast_adjusted = np.clip(rgb_frame + self.args.contrast, 0, 255)
+
+        # Convert each brightness value to an ASCII character
+        ascii_chars = np.vectorize(self.pixel_to_ascii)(brightness.astype(int))
+
+        # Generate ANSI color codes for background and foreground
+        bg_colors = np.vectorize(self.rgb_to_ansi_bg)(rgb_frame[:, :, 0], rgb_frame[:, :, 1], rgb_frame[:, :, 2])
+        fg_colors = np.vectorize(self.rgb_to_ansi_fg)(contrast_adjusted[:, :, 0],
+                                                      contrast_adjusted[:, :, 1],
+                                                      contrast_adjusted[:, :, 2])
+
+        # Create the formatted ASCII image by combining fg, bg colors, and ASCII chars
+        ascii_image_array = np.char.add(np.char.add(fg_colors, bg_colors), ascii_chars)
+        ascii_image_array = np.char.add(ascii_image_array, "\033[0m")
+
+        # Convert the 2D array into a single string with newlines for each row
+        ascii_image = "\n".join("".join(row) for row in ascii_image_array)
+
+        return ascii_image
 
     def print_ascii_frame(self, ascii_frame: str) -> None:
         # Move cursor to top left of the terminal
@@ -91,7 +123,10 @@ class VideoRenderer:
                             interpolation=cv2.INTER_LINEAR,
                         )
 
-                        ascii_frame = self.frame_to_ascii(frame)
+                        if self.args.isrgb:
+                            ascii_frame = self.frame_to_ascii_rgb(frame)
+                        else:
+                            ascii_frame = self.frame_to_ascii(frame)
                         self.print_ascii_frame(ascii_frame)
 
                         # Calculate the elapsed time for this frame
@@ -161,7 +196,10 @@ class VideoRenderer:
                             interpolation=cv2.INTER_LINEAR,
                         )
 
-                        ascii_frame = self.frame_to_ascii(frame)
+                        if self.args.isrgb:
+                            ascii_frame = self.frame_to_ascii_rgb(frame)
+                        else:
+                            ascii_frame = self.frame_to_ascii(frame)
 
                         self.save_frame(ascii_frame, output_path)
                         count += 1
