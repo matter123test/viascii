@@ -7,7 +7,7 @@ __SAMPLE VIDEOS:__
 [![Video Title](https://img.youtube.com/vi/gYzZu_EXCgI/0.jpg)](https://www.youtube.com/watch?v=gYzZu_EXCgI)
 [![Video Title](https://img.youtube.com/vi/21dyw6Qk27E/0.jpg)](https://www.youtube.com/watch?v=21dyw6Qk27E)
 
-# Installation Guide
+# Installation
 
 To download the repository:
 
