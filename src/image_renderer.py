@@ -1,6 +1,6 @@
-import os
-
 from PIL import Image
+
+from src.utils import clear_screen
 
 
 class ImageRenderer:
@@ -34,13 +34,13 @@ class ImageRenderer:
                 )  # Calculate brightness
                 ascii_char = self.pixel_to_ascii(brightness)
                 bg_color = self.rgb_to_ansi_bg(r, g, b)  # Get ANSI color code
-                fg_color = self.rgb_to_ansi_fg(min(255, r + self.args.contrast),
-                                               min(255, g + self.args.contrast),
-                                               min(255, b + self.args.contrast))  # Change the font's contrast
+                fg_color = self.rgb_to_ansi_fg(
+                    min(255, r + self.args.contrast),
+                    min(255, g + self.args.contrast),
+                    min(255, b + self.args.contrast),
+                )  # Change the font's contrast
 
-                line += (
-                    f"{fg_color}{bg_color}{ascii_char}\033[0m"  # Reset color after each char
-                )
+                line += f"{fg_color}{bg_color}{ascii_char}\033[0m"  # Reset color after each char
 
             ascii_image += line + "\n"
 
@@ -65,7 +65,7 @@ class ImageRenderer:
         return ascii_image
 
     def print_image(self, image_path, is_rgb: bool, angle: int):
-        os.system("clear")
+        clear_screen()
 
         if is_rgb:
             rgb_image = Image.open(image_path).convert("RGB")

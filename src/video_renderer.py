@@ -6,8 +6,10 @@ import sys
 import numpy as np
 import linecache
 
-from audio_player import AudioPlayer
+from src.audio_player import AudioPlayer
 from tqdm import tqdm
+
+from src.utils import clear_screen
 
 
 class VideoRenderer:
@@ -50,7 +52,11 @@ class VideoRenderer:
     # TODO: Make an async function that handles printing and generating frames instead of running on the same thread
     def frame_to_ascii_rgb(self, frame) -> str:
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        brightness = 0.299 * rgb_frame[:, :, 0] + 0.587 * rgb_frame[:, :, 1] + 0.114 * rgb_frame[:, :, 2]
+        brightness = (
+            0.299 * rgb_frame[:, :, 0]
+            + 0.587 * rgb_frame[:, :, 1]
+            + 0.114 * rgb_frame[:, :, 2]
+        )
 
         # Apply contrast adjustments to RGB channels
         contrast_adjusted = np.clip(rgb_frame + self.args.contrast, 0, 255)
@@ -59,10 +65,14 @@ class VideoRenderer:
         ascii_chars = np.vectorize(self.pixel_to_ascii)(brightness.astype(int))
 
         # Generate ANSI color codes for background and foreground
-        bg_colors = np.vectorize(self.rgb_to_ansi_bg)(rgb_frame[:, :, 0], rgb_frame[:, :, 1], rgb_frame[:, :, 2])
-        fg_colors = np.vectorize(self.rgb_to_ansi_fg)(contrast_adjusted[:, :, 0],
-                                                      contrast_adjusted[:, :, 1],
-                                                      contrast_adjusted[:, :, 2])
+        bg_colors = np.vectorize(self.rgb_to_ansi_bg)(
+            rgb_frame[:, :, 0], rgb_frame[:, :, 1], rgb_frame[:, :, 2]
+        )
+        fg_colors = np.vectorize(self.rgb_to_ansi_fg)(
+            contrast_adjusted[:, :, 0],
+            contrast_adjusted[:, :, 1],
+            contrast_adjusted[:, :, 2],
+        )
 
         # Create the formatted ASCII image by combining fg, bg colors, and ASCII chars
         ascii_image_array = np.char.add(np.char.add(fg_colors, bg_colors), ascii_chars)
@@ -79,8 +89,7 @@ class VideoRenderer:
         sys.stdout.flush()
 
     def print_ascii_frames(self, video_path: str, is_audio=False) -> None:
-        os.system("clear")
-
+        clear_screen()
         cap = cv2.VideoCapture(video_path)
 
         cap.get(cv2.CAP_PROP_FRAME_COUNT)
@@ -94,7 +103,7 @@ class VideoRenderer:
         if is_audio:
             audio_player = AudioPlayer(video_path, self.args)
 
-        os.system("clear")
+        clear_screen()
 
         count = 0
 
@@ -111,8 +120,8 @@ class VideoRenderer:
                     if count >= self.args.startin:
                         # Play audio after searching the frame
                         if (
-                                audio_player is not None
-                                and not audio_player.is_audio_played()
+                            audio_player is not None
+                            and not audio_player.is_audio_played()
                         ):
                             audio_player.play_audio()
                             audio_player.set_pos(audio_time_skip)
@@ -158,7 +167,7 @@ class VideoRenderer:
             f.write(f"{ascii_frame}\n")
 
     def save_frames(self, video_path, output_path):
-        os.system("clear")
+        clear_screen()
 
         if os.path.exists(output_path):
             print(f"{output_path} already exists!")
@@ -207,7 +216,7 @@ class VideoRenderer:
                     else:
                         break
             except KeyboardInterrupt:
-                os.system("clear")
+                clear_screen()
 
         print(f"Saving frames completed.")
 
@@ -219,7 +228,7 @@ class VideoRenderer:
         return ascii_frame
 
     def read_frames(self, frames_path):
-        os.system("clear")
+        clear_screen()
 
         with open(frames_path, "r") as f:
             frame_format = f.readline()
