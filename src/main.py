@@ -2,13 +2,13 @@ import argparse
 import time
 import os
 
-from video_renderer import VideoRenderer
-from image_renderer import ImageRenderer
+from src.video_renderer import VideoRenderer
+from src.image_renderer import ImageRenderer
 
 # Initialize the parser
 parser = argparse.ArgumentParser(description="Video to ascii converter")
 
-# Add arguments
+# Video and Image arguments (some of them)
 parser.add_argument(
     "-v", "--video", type=str, help="The path of the video", default=None
 )
@@ -68,16 +68,26 @@ parser.add_argument(
     default=None,
 )
 
-# Image args
+# Image only args
 parser.add_argument(
     "-im", "--image", type=str, help="The path of the image", default=None
 )
 
-parser.add_argument("-ir", "--isrgb", action="store_true", help="This only applies to images")
+parser.add_argument(
+    "-ir", "--isrgb", action="store_true", help="This only applies to images"
+)
 
-parser.add_argument("-an", "--angle", type=int, help="Changes the image angle", default=90)
+parser.add_argument(
+    "-an", "--angle", type=int, help="Changes the image angle", default=90
+)
 
-parser.add_argument("-c", "--contrast", type=int, help="Set the contrast of the foreground text", default=0)
+parser.add_argument(
+    "-c",
+    "--contrast",
+    type=int,
+    help="Set the contrast of the foreground text",
+    default=0,
+)
 
 program_args = parser.parse_args()
 
@@ -95,7 +105,7 @@ def calculate_time(func):
     return wrapper
 
 
-def main():
+def run():
     # Read from file
     viascii = VideoRenderer(program_args)
     if program_args.endin is not None and program_args.endin < program_args.startin:
@@ -132,4 +142,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run()
