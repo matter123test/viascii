@@ -7,14 +7,14 @@ class ImageRenderer:
     def __init__(self, args) -> None:
         self.args = args
 
-    def pixel_to_ascii(self, brightness):
+    def pixel_to_ascii(self, brightness) -> str:
         numchars = len(self.args.grayscale)
         return self.args.grayscale[int(brightness / 255 * (numchars - 1))]
 
-    def rgb_to_ansi_bg(self, r, g, b):
+    def rgb_to_ansi_bg(self, r: int, g: int, b: int) -> str:
         return f"\033[48;2;{r};{g};{b}m"  # ANSI background color
 
-    def rgb_to_ansi_fg(self, r, g, b):
+    def rgb_to_ansi_fg(self, r: int, g: int, b: int) -> str:
         return f"\033[38;2;{r};{g};{b}m"  # ANSI foreground color
 
     def image_to_ascii_rgb(self, image) -> str:
@@ -64,7 +64,7 @@ class ImageRenderer:
 
         return ascii_image
 
-    def print_image(self, image_path, is_rgb: bool, angle: int):
+    def print_image(self, image_path, is_rgb: bool, angle: int) -> None:
         clear_screen()
 
         if is_rgb:
@@ -85,6 +85,6 @@ class ImageRenderer:
         if self.args.savepath is not None:
             self.save_image(ascii_image)
 
-    def save_image(self, ascii_image):
+    def save_image(self, ascii_image: str) -> None:
         with open(self.args.savepath, "w") as f:
             f.write(ascii_image)

@@ -32,10 +32,10 @@ class VideoRenderer:
         # Normalize the grayscale value to the range of characters
         return self.grayscale[int(gray_value / 255 * (num_chars - 1))]
 
-    def rgb_to_ansi_bg(self, r, g, b):
+    def rgb_to_ansi_bg(self, r: int, g: int, b: int) -> str:
         return f"\033[48;2;{r};{g};{b}m"  # ANSI background color
 
-    def rgb_to_ansi_fg(self, r, g, b):
+    def rgb_to_ansi_fg(self, r: int, g: int, b: int) -> str:
         return f"\033[38;2;{r};{g};{b}m"  # ANSI foreground color
 
     def frame_to_ascii(self, frame) -> str:
@@ -166,7 +166,7 @@ class VideoRenderer:
         with open(output_path, "a") as f:
             f.write(f"{ascii_frame}\n")
 
-    def save_frames(self, video_path, output_path):
+    def save_frames(self, video_path: str, output_path: str) -> None:
         clear_screen()
 
         if os.path.exists(output_path):
@@ -220,14 +220,14 @@ class VideoRenderer:
 
         print(f"Saving frames completed.")
 
-    def get_frame_from_file(self, frames_path, line_start, line_end):
+    def get_frame_from_file(self, frames_path: str, line_start: int, line_end: int) -> str:
         ascii_frame = ""
         for i in range(line_start, line_end):
             ascii_frame += linecache.getline(frames_path, i + 2)
 
         return ascii_frame
 
-    def read_frames(self, frames_path):
+    def read_frames(self, frames_path: str) -> None:
         clear_screen()
 
         with open(frames_path, "r") as f:
