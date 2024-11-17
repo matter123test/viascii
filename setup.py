@@ -1,8 +1,11 @@
 import os
 import platform
 import zipfile
+import tarfile
 import urllib.request
 from tqdm import tqdm
+
+from src.utils import get_os_name
 
 
 def download(url, output_dir):
@@ -26,46 +29,56 @@ def download(url, output_dir):
     print("\nDownload completed!")
 
 
-def extract(zip_path, output_dir):
-    with zipfile.ZipFile(zip_path, "r") as zip_ref:
-        zip_ref.extractall(output_dir)
+def extract(format, compressed_file_path: str, output_dir: str) -> None:
+    if format == ".zip":    
+        with zipfile.ZipFile(compressed_file_path, "r") as ref:
+            ref.extractall(output_dir)
+            
+    if format == ".tar.xz":
+        with tarfile.open(compressed_file_path, "r") as ref:
+            ref.extractall(output_dir)
 
 
 def install_ffmpeg():
-    """Simple function to download FFmpeg binaries."""
-    os_name = platform.system().lower()
+    os_name = get_os_name()
+    
     ffmpeg_urls = {
         "windows": "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip",
         "linux": "https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-amd64-static.tar.xz",
     }
 
+    formats = {
+        "windows": ".zip",
+        "linux": ".tar.xz"
+    }
+
     url = ffmpeg_urls.get(os_name)
     if not url:
         raise RuntimeError("FFmpeg binary is not available for your OS.")
+    
+    
 
     download_path = "ffmpeg_download"
     os.makedirs(download_path, exist_ok=True)
 
     print(f"Downloading FFmpeg for {os_name}...")
 
-    download(url, f"{download_path}/ffmpeg.zip")
+    file_format = formats.get(os_name)
+    compressed_file_path = f"ffmpeg{file_format}"
+    
+    download(url, f"{download_path}/{compressed_file_path}")
 
+    print(f"Extracting {compressed_file_path}")
     # Extract the binary
-    # with zipfile.ZipFile(f"{download_path}/ffmpeg.zip", "r") as zip_ref:
-    #     zip_ref.extractall(download_path)
-    extract(f"{download_path}/ffmpeg.zip", f"{download_path}")
+    extract(file_format, f"{download_path}/{compressed_file_path}", f"{download_path}")
 
     # Remove downloaded zip file
     print(f"Removing downloaded zip file")
-    os.remove(f"{download_path}/ffmpeg.zip")
+    os.remove(f"{download_path}/{compressed_file_path}")
     print(f"Removed zip file")
 
     return download_path
 
-
 if __name__ == "__main__":
-    try:
-        ffmpeg_binary = install_ffmpeg()
-        print(f"FFmpeg installed successfully: {ffmpeg_binary}")
-    except Exception as e:
-        print(f"Error setting up FFmpeg: {e}")
+    ffmpeg_binary = install_ffmpeg()
+    print(f"FFmpeg installed successfully: {ffmpeg_binary}")

@@ -13,6 +13,11 @@ class AudioPlayer:
         self.volume = self.args.audiovolume / 100
 
         self.ffmpeg_path = str(get_ffmpeg_binary())
+        
+        if self.ffmpeg_path is None:
+            print("FFmpeg path doesn't exist")
+            quit()
+        
         print(self.ffmpeg_path)
 
         pygame.init()
