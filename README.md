@@ -65,7 +65,7 @@ Example command:
 
 With the custom dimensions (the default value is (100, 50)):
 
-```python run.py bad_apple.mp4 --audio -rt --dimensions=120,70"```
+```python run.py bad_apple.mp4 --audio -rt --dimensions=120,70```
 
 Reading ascii frames from a file:
 
